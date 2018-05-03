@@ -1,0 +1,21 @@
+#RoutrOS v6
+/routing filter
+add action=accept chain=ospf-in-slt prefix=192.168.210.0/24
+add action=discard chain=ospf-in-slt
+add action=accept chain=ospf-out-slt prefix=IP-LAN
+add action=discard chain=ospf-out-slt
+/
+/routing ospf instance
+add in-filter=ospf-in-slt name=saltovsky out-filter=ospf-out-slt redistribute-connected=as-type-1 router-id=IP-ROUTER
+/
+/routing ospf area
+add area-id=10.0.210.0 instance=saltovsky name=saltovsky
+/
+/routing ospf network
+add area=saltovsky network=10.0.210.0/24
+/
+/ppp profile
+add change-tcp-mss=no name=OUT use-compression=yes use-encryption=yes use-mpls=no use-upnp=no
+/
+/interface pptp-client
+add allow=mschap2 connect-to=cloud.saltovsky.ru disabled=no name=TO-SLT password=Password profile=OUT user=Login
