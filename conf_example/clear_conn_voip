@@ -1,0 +1,4 @@
+/ip firewall connection remove [ find src-address ~ ".*:5060" ]
+/ip firewall connection remove [ find dst-address ~ ".*:5060" ]
+/ip firewall connection remove [ find src-address ~ ".*:4569" ]
+/ip firewall connection remove [ find dst-address ~ ".*:4569" ]
