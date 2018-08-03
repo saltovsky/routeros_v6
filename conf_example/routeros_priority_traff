@@ -1,0 +1,213 @@
+#RouterOS v6
+#
+#Mangle
+/ip firewall mangle
+add action=accept chain=forward comment="############## LOW #############" \
+    disabled=yes
+add action=mark-connection chain=forward comment=ALL-TRAFFIC \
+    new-connection-mark=LOW passthrough=yes
+add action=mark-packet chain=forward comment=LOW-DOWNLOAD connection-mark=LOW \
+    dst-address-list=LAN new-packet-mark=LOW-DOWNLOAD passthrough=yes \
+    src-address-list=!LAN-EXCEPTION
+add action=mark-packet chain=prerouting comment=LOW-UPLOAD connection-mark=\
+    LOW dst-address-list=!LAN-EXCEPTION new-packet-mark=LOW-UPLOAD \
+    passthrough=yes src-address-list=LAN
+add action=accept chain=forward comment="############## END LOW #########" \
+    disabled=yes
+add action=accept chain=forward comment="############## NORMAL #########" \
+    disabled=yes
+add action=mark-connection chain=forward comment=HTTP layer7-protocol=HTTP \
+    new-connection-mark=NORMAL passthrough=yes protocol=tcp
+add action=mark-connection chain=forward comment=HTTPS new-connection-mark=\
+    NORMAL passthrough=yes port=443 protocol=tcp
+add action=mark-connection chain=forward comment=Proxy new-connection-mark=\
+    NORMAL passthrough=yes port=3128,8080 protocol=tcp
+add action=mark-connection chain=forward comment=FTP new-connection-mark=\
+    NORMAL passthrough=yes port=20,21 protocol=tcp
+add action=mark-connection chain=forward comment=SMTP new-connection-mark=\
+    NORMAL passthrough=yes port=25 protocol=tcp
+add action=mark-connection chain=forward comment=SMTPS new-connection-mark=\
+    NORMAL passthrough=yes port=465 protocol=tcp
+add action=mark-connection chain=forward comment=IMAP new-connection-mark=\
+    NORMAL passthrough=yes port=143 protocol=tcp
+add action=mark-connection chain=forward comment=POP3 new-connection-mark=\
+    NORMAL passthrough=yes port=110 protocol=tcp
+add action=mark-connection chain=forward comment=POP3S new-connection-mark=\
+    NORMAL passthrough=yes port=995 protocol=tcp
+add action=mark-connection chain=forward comment=IMAPS new-connection-mark=\
+    NORMAL passthrough=yes port=993 protocol=tcp
+add action=mark-connection chain=forward comment=GIF_FILE layer7-protocol=\
+    GIF_FILE new-connection-mark=NORMAL passthrough=yes
+add action=mark-connection chain=forward comment=PNG_FILE layer7-protocol=\
+    PNG_FILE new-connection-mark=NORMAL passthrough=yes
+add action=mark-connection chain=forward comment=JPG_FILE layer7-protocol=\
+    JPG_FILE new-connection-mark=NORMAL passthrough=yes
+add action=mark-connection chain=forward comment="100Kb Connections" \
+    connection-bytes=0-100000 new-connection-mark=NORMAL passthrough=yes \
+    protocol=tcp
+add action=mark-packet chain=forward comment=NORMAL-DOWNLOAD connection-mark=\
+    NORMAL dst-address-list=LAN new-packet-mark=NORMAL-DOWNLOAD passthrough=\
+    yes src-address-list=!LAN-EXCEPTION
+add action=mark-packet chain=prerouting comment=NORMAL-UPLOAD \
+    connection-mark=NORMAL dst-address-list=!LAN-EXCEPTION new-packet-mark=\
+    NORMAL-UPLOAD passthrough=yes src-address-list=LAN
+add action=accept chain=forward comment=\
+    "############## END NORMAL ############" disabled=yes
+add action=accept chain=forward comment="############## HIGH ############" \
+    disabled=yes
+add action=mark-connection chain=input comment=SNMP new-connection-mark=HIGH \
+    passthrough=yes port=161-162 protocol=tcp
+add action=mark-connection chain=input comment=SNMP new-connection-mark=HIGH \
+    passthrough=yes port=161-162 protocol=udp
+add action=mark-connection chain=forward comment=ASTERISK \
+    new-connection-mark=HIGH passthrough=yes protocol=udp src-address=\
+    IPADDRESS
+add action=mark-connection chain=forward comment=ASTERISK dst-address=\
+    IPADDRESS new-connection-mark=HIGH passthrough=yes protocol=udp
+add action=mark-connection chain=forward comment=SIP layer7-protocol=SIP \
+    new-connection-mark=HIGH passthrough=yes protocol=udp
+add action=mark-connection chain=forward comment=RTP layer7-protocol=RTP \
+    new-connection-mark=HIGH passthrough=yes protocol=udp
+add action=mark-connection chain=forward comment=SSH new-connection-mark=HIGH \
+    packet-size=0-1400 passthrough=yes port=22 protocol=tcp
+add action=mark-connection chain=forward comment=TELNET new-connection-mark=\
+    HIGH passthrough=yes port=23 protocol=tcp
+add action=mark-connection chain=input comment=GRE new-connection-mark=HIGH \
+    passthrough=yes protocol=gre
+add action=mark-connection chain=output comment=GRE new-connection-mark=HIGH \
+    passthrough=yes protocol=gre
+add action=mark-connection chain=forward comment=GRE new-connection-mark=HIGH \
+    passthrough=yes protocol=gre
+add action=mark-connection chain=input comment=OSPF new-connection-mark=HIGH \
+    passthrough=yes protocol=ospf
+add action=mark-connection chain=output comment=OSPF new-connection-mark=HIGH \
+    passthrough=yes protocol=ospf
+add action=mark-connection chain=input comment=L2TP dst-port=1701 \
+    new-connection-mark=HIGH passthrough=yes protocol=udp
+add action=mark-connection chain=forward comment=L2TP new-connection-mark=\
+    HIGH passthrough=yes port=1701 protocol=udp
+add action=mark-connection chain=forward comment=PPTP new-connection-mark=\
+    HIGH passthrough=yes port=1723 protocol=tcp
+add action=mark-connection chain=input comment=IPSEC dst-port=500,4500 \
+    new-connection-mark=HIGH passthrough=yes protocol=udp
+add action=mark-connection chain=output comment=IPSEC dst-port=500,4500 \
+    new-connection-mark=HIGH passthrough=yes protocol=udp
+add action=mark-connection chain=forward comment=ICQ new-connection-mark=HIGH \
+    passthrough=yes port=5190 protocol=tcp
+add action=mark-connection chain=forward comment=Jabber new-connection-mark=\
+    HIGH passthrough=yes port=5222,5223 protocol=tcp
+add action=mark-connection chain=forward comment=IRC new-connection-mark=HIGH \
+    passthrough=yes port=6667-6669 protocol=tcp
+add action=mark-connection chain=forward comment="50Kb Connections" \
+    connection-bytes=0-50000 new-connection-mark=HIGH passthrough=yes \
+    protocol=tcp
+add action=mark-packet chain=forward comment=HIGH-DOWNLOAD connection-mark=\
+    HIGH dst-address-list=LAN new-packet-mark=HIGH-DOWNLOAD passthrough=yes \
+    src-address-list=!LAN-EXCEPTION
+add action=mark-packet chain=prerouting comment=HIGH-UPLOAD connection-mark=\
+    HIGH dst-address-list=!LAN-EXCEPTION new-packet-mark=HIGH-UPLOAD \
+    passthrough=yes src-address-list=LAN
+add action=accept chain=forward comment="############## END HIGH ##########" \
+    disabled=yes
+add action=accept chain=forward comment=\
+    "############## SUPER-HIGH ##########" disabled=yes
+add action=mark-connection chain=input comment=WINBOX new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=8291 protocol=tcp
+add action=mark-connection chain=forward comment=WINBOX new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=8291 protocol=tcp
+add action=mark-connection chain=input comment=DNS new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=53 protocol=udp
+add action=mark-connection chain=output comment=DNS new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=53 protocol=udp
+add action=mark-connection chain=forward comment=DNS new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=53 protocol=tcp src-port=53
+add action=mark-connection chain=forward comment=DNS new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=53 protocol=tcp
+add action=mark-connection chain=forward comment=DNS new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=53 protocol=udp
+add action=mark-connection chain=forward comment=NNTP new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=119 protocol=tcp
+add action=mark-connection chain=forward comment=ntp new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=123 protocol=udp
+add action=mark-connection chain=forward comment=VNC new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=5900-5901 protocol=tcp
+add action=mark-connection chain=forward comment=RDP new-connection-mark=\
+    SUPER-HIGH passthrough=yes port=3389 protocol=tcp
+add action=mark-connection chain=forward comment=PING new-connection-mark=\
+    SUPER-HIGH passthrough=yes protocol=icmp
+add action=mark-connection chain=forward comment="5Kb Connections" \
+    connection-bytes=0-5000 new-connection-mark=SUPER-HIGH passthrough=yes \
+    protocol=tcp
+add action=mark-packet chain=forward comment=SUPER-HIGH-DOWNLOAD \
+    connection-mark=SUPER-HIGH dst-address-list=LAN new-packet-mark=\
+    SUPER-HIGH-DOWNLOAD passthrough=yes src-address-list=!LAN-EXCEPTION
+add action=mark-packet chain=prerouting comment=SUPER-HIGH-UPLOAD \
+    connection-mark=SUPER-HIGH dst-address-list=!LAN-EXCEPTION \
+    new-packet-mark=SUPER-HIGH-UPLOAD passthrough=yes src-address-list=LAN
+add action=accept chain=forward comment=\
+    "############## END SUPER-HIGH ##########" disabled=yes
+#
+#
+#
+#
+#Layer7
+/ip firewall layer7-protocol
+add name=HTTP regexp="http/(0\\.9|1\\.0|1\\.1) [1-5][0-9][0-9]|post [\\x09-\\x\
+    0d -~]* http/[01]\\.[019]"
+add name=GIF_FILE regexp=gif
+add name=PNG_FILE regexp=png
+add name=JPG_FILE regexp=jpg
+add name=SIP regexp="^(invite|register|cancel|message|subscribe|notify) sip[\\\
+    x09-\\x0d -~]*sip/[0-2]\\.[0-9]"
+add name=RTP regexp=\
+    "^\\x80[\\x01-\"`-\\x7f\\x80-\\xa2\\xe0-\\xff]\?..........*\\x80"
+add name=Bittorrent regexp="^(\\x13bittorrent protocol|azver\\x01\$|get /scrap\
+    e\\\?info_hash=get /announce\\\?info_hash=|get /client/bitcomet/|GET /data\
+    \\\?fid=)|d1:ad2:id20:|\\x08'7P\\)[RP]"
+add name=rutracker.org regexp="^.*(rutracker.org).*\$"
+#
+#
+#
+#
+#Queue_type
+/queue type
+add kind=pcq name=PCQ-DOWNLOAD pcq-classifier=dst-address
+add kind=pcq name=PCQ-UPLOAD pcq-classifier=src-address
+#
+#
+#
+#
+#Queue_tree (example 100m Upload/Download)
+/queue tree
+add max-limit=90M name=DOWNLOAD parent=global
+add name=SUPER-HIGH-DOWNLOAD packet-mark=SUPER-HIGH-DOWNLOAD parent=DOWNLOAD \
+    priority=1 queue=PCQ-DOWNLOAD
+add name=HIGH-DOWNLOAD packet-mark=HIGH-DOWNLOAD parent=DOWNLOAD priority=2 \
+    queue=PCQ-DOWNLOAD
+add name=NORMAL-DOWNLOAD packet-mark=NORMAL-DOWNLOAD parent=DOWNLOAD \
+    priority=3 queue=PCQ-DOWNLOAD
+add name=LOW-DOWNLOAD packet-mark=LOW-DOWNLOAD parent=DOWNLOAD priority=4 \
+    queue=PCQ-DOWNLOAD
+add max-limit=90M name=UPLOAD parent=global
+add name=SUPER-HIGH-UPLOAD packet-mark=SUPER-HIGH-UPLOAD parent=UPLOAD \
+    priority=1 queue=PCQ-UPLOAD
+add name=HIGH-UPLOAD packet-mark=HIGH-UPLOAD parent=UPLOAD priority=2 queue=\
+    PCQ-UPLOAD
+add name=NORMAL-UPLOAD packet-mark=NORMAL-UPLOAD parent=UPLOAD priority=3 \
+    queue=PCQ-UPLOAD
+add name=LOW-UPLOAD packet-mark=LOW-UPLOAD parent=UPLOAD priority=4 queue=\
+    PCQ-UPLOAD
+#
+#
+#
+#
+#Firewall_address-list
+/ip firewall address-list
+add address=YOURIPADDRESS/MASK list=LAN
+add address=10.0.0.0/8 list=LAN-EXCEPTION
+add address=172.16.0.0/12 list=LAN-EXCEPTION
+add address=192.168.0.0/16 list=LAN-EXCEPTION
+#
+#
+#
+#END
