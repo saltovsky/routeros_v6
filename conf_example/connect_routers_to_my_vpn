@@ -18,4 +18,4 @@ add area=saltovsky network=10.0.210.0/24
 add change-tcp-mss=no name=OUT use-compression=yes use-encryption=yes use-mpls=no use-upnp=no
 /
 /interface pptp-client
-add allow=mschap2 connect-to=cloud.saltovsky.ru disabled=no name=TO-SLT password=Password profile=OUT user=Login
+add allow=mschap2 connect-to=_HOST_ disabled=no name=TO-SLT password=Password profile=OUT user=Login
